@@ -50,7 +50,6 @@ def photos(request):
     return render(request, "photos.html", {"photos": photos})
 
 def login_view(request):
-def login_view(request):
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
@@ -66,6 +65,24 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("login"))
+
+def concerts(request):
+    if request.user.is_authenticated:
+        lst_of_concert = []
+        concert_objects = Concert.objects.all()
+        for item in concert_objects:
+            try:
+                status = item.attendee.filter(
+                    user=request.user).first().attending
+            except:
+                status = "-"
+            lst_of_concert.append({
+                "concert": item,
+                "status": status
+            })
+        return render(request, "concerts.html", {"concerts": lst_of_concert})
+    else:
+        return HttpResponseRedirect(reverse("login"))
 
 def concert_detail(request, id):
     if request.user.is_authenticated:
